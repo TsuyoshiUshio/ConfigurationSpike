@@ -1,32 +1,26 @@
-﻿using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace ConfigurationSpike
 {
-    internal class FunctionsHostService : IHostedService
+    public class FunctionsHostService : IHostedService
     {
-        private HostConfigService _hostConfigService;
-        private KafkaOptions _kafkaOptions;
-        private HttpOptions _httpOptions;
-        public FunctionsHostService(HostConfigService hostConfigService, KafkaOptions kafkaOptions, HttpOptions httpOptions)
+        private readonly IConfiguration _configuration;
+        private readonly KafkaOptions _kafkaOptions;
+        private readonly HttpOptions _httpOptions;
+        public FunctionsHostService(
+            IConfiguration configration, IOptions<KafkaOptions> kafkaOptions, IOptions<HttpOptions> httpOptions
+            )
         {
-            _hostConfigService = hostConfigService;
-            _kafkaOptions = kafkaOptions;
-            _httpOptions = httpOptions;
+            _configuration = configration;
+            _kafkaOptions = kafkaOptions.Value;
+            _httpOptions = httpOptions.Value;
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            Console.WriteLine("HostConfigService:");
-            Console.WriteLine(JsonConvert.SerializeObject(_hostConfigService));
-            Console.WriteLine("KafkaOptions:");
-            Console.WriteLine(JsonConvert.SerializeObject(_kafkaOptions));
-            Console.WriteLine("HttpOptions:");
-            Console.WriteLine(JsonConvert.SerializeObject(_httpOptions));
+            Console.WriteLine("FunctionsHostService Started...");
+            ShowConfigrations();
             return Task.CompletedTask;
         }
 
@@ -34,6 +28,12 @@ namespace ConfigurationSpike
         {
             Console.WriteLine("Drain Mode started...");
             return Task.CompletedTask;
+        }
+
+        private void ShowConfigrations()
+        {
+            Console.WriteLine("ExteionsConfiguration:");
+            Console.WriteLine(_configuration[Constants.ExtensionsConfigurationKey]);
         }
     }
 }

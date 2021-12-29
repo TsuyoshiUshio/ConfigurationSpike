@@ -19,41 +19,34 @@ namespace ConfigurationSpike
 
         static IHostBuilder CreateHostBuilder(string[] args)
         {
+            ExtensionsConfigurationDataSource.Clear();
             var builder = Host.CreateDefaultBuilder(args);
-            builder.ConfigureServices(
-            services =>
+            builder.ConfigureAppConfiguration((context, config) =>
             {
-                builder.ConfigureAppConfiguration((context, config) =>
-                {
-                    // this section has not called yet, when executed when we call AddHostedService
-                    config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-                    IConfigurationRoot configurationRoot = config.Build();
-                    var extensionsSection = configurationRoot.GetSection("extensions");
-                    var kafkaSection = extensionsSection.GetSection("kafka");
-                    KafkaOptions kafkaOptions = new();
-                    kafkaSection.Bind(kafkaOptions);
-                    services.AddSingleton<HostConfigService>(provider =>
-                    {
-                        var service = provider.GetRequiredService<HostConfigService>();
-                        if (service == null)
-                            service = new HostConfigService();
-                        service.Content.Add("kafka", JObject.Parse(JsonConvert.SerializeObject(kafkaOptions)));
-                        return service;
-                    });
-                    var httpSection = extensionsSection.GetSection("http");
-                    HttpOptions httpOptions = new();
-                    httpSection.Bind(httpOptions);
-                    services.AddSingleton<HostConfigService>(provider =>
-                    {
-                        var service = provider.GetRequiredService<HostConfigService>();
-                        service.Content.Add("http", JObject.Parse(JsonConvert.SerializeObject(httpOptions)));
-                        return service;
-                    });
-                });
-            }).ConfigureServices(services =>
+                config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                IConfigurationRoot configurationRoot = config.Build();
+                var extensionsSection = configurationRoot.GetSection("extensions");
+                var kafkaSection = extensionsSection.GetSection("kafka");
+                KafkaOptions kafkaOptions = new();
+                kafkaSection.Bind(kafkaOptions);
+                ExtensionsConfigurationDataSource.Register("kafka", kafkaOptions);
+            }).ConfigureAppConfiguration((context, config)=> {
+                IConfigurationRoot configurationRoot = config.Build();
+                var extensionsSection = configurationRoot.GetSection("extensions");
+                var httpSection = extensionsSection.GetSection("http");
+                HttpOptions httpOptions = new();
+                httpSection.Bind(httpOptions);
+                ExtensionsConfigurationDataSource.Register("http", httpOptions);
+            })
+            .ConfigureAppConfiguration(config =>
+            {
+                config.AddExtensionsConfigration();
+            })
+            .ConfigureServices(services =>
             {
                 services.AddHostedService<FunctionsHostService>();
             });
+            
             return builder;
         }
                 
