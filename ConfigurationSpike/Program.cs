@@ -38,6 +38,15 @@ namespace ConfigurationSpike
                 httpSection.Bind(httpOptions);
                 ExtensionsConfigurationDataSource.Register("http", httpOptions);
             })
+            .ConfigureServices((context, services) => {
+                var configurationRoot = context.Configuration;
+                services.Configure<KafkaOptions>(
+                    configurationRoot.GetSection("extensions").GetSection("kafka")
+                    );
+                services.Configure<HttpOptions>(
+                    configurationRoot.GetSection("extensions").GetSection("http")
+                    );
+            })
             .ConfigureAppConfiguration(config =>
             {
                 config.AddExtensionsConfigration();

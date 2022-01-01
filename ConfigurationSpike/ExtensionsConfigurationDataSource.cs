@@ -12,10 +12,27 @@ namespace ConfigurationSpike
     public class ExtensionsConfigurationDataSource
     {
         private static ConcurrentDictionary<string, object> _extensiosConfigs = new ConcurrentDictionary<string, object>();
+        private static ConcurrentDictionary<string, Action> _subscriber = new ConcurrentDictionary<string, Action>();
+
 
         public static object Register(string section, object config)
         {
-           return _extensiosConfigs.AddOrUpdate(section, config, (k, v) => v);
+           var obj = _extensiosConfigs.AddOrUpdate(section, config, (k, v) => v);
+            Nortify();
+            return obj;
+        }
+
+        public static object Subscribe(string key, Action action)
+        {
+            return _subscriber.AddOrUpdate(key, action, (k, v) => action);
+        }
+
+        private static void Nortify()
+        {
+            foreach(var x in _subscriber.Values)
+            {
+                x.Invoke();
+            }
         }
 
         public static void Clear()
