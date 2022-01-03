@@ -44,8 +44,10 @@ namespace ConfigurationSpike
                     configurationRoot.GetSection("extensions").GetSection("kafka")
                     );
                 services.Configure<HttpOptions>(
-                    configurationRoot.GetSection("extensions").GetSection("http")
+                    configurationRoot.GetSection("extensions:http")
                     );
+                services.Configure<ExtensionsOptions>(
+                    configurationRoot.GetSection(Constants.ExtensionsConfigurationKey));
             })
             .ConfigureAppConfiguration(config =>
             {

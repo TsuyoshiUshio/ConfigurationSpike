@@ -8,6 +8,7 @@ namespace ConfigurationSpike
 {
     public class Constants
     {
-        public const string ExtensionsConfigurationKey = "ExtensionsConfiguration";
+        // public const string ExtensionsConfigurationKey = "ExtensionsConfiguration";
+        public const string ExtensionsConfigurationKey = "extensions";
     }
 }

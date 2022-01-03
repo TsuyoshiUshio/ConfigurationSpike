@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ConfigurationSpike
 {
-    internal class EventHubsOptions
+    public class EventHubsOptions
     {
         public int AutoCommitInterval { get; set; } = 2;
     }

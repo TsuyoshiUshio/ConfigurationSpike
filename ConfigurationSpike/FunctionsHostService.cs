@@ -12,10 +12,11 @@ namespace ConfigurationSpike
         private readonly IConfiguration _configuration;
         private readonly IOptionsMonitor<KafkaOptions> _kafkaOptions;
         private readonly HttpOptions _httpOptions;
+        private readonly IOptionsMonitor<ExtensionsOptions> _extensionsOptions;
 
         private System.Timers.Timer _timer;
         public FunctionsHostService(
-            IConfiguration configration, IOptionsMonitor<KafkaOptions> kafkaOptions, IOptions<HttpOptions> httpOptions
+            IConfiguration configration, IOptionsMonitor<KafkaOptions> kafkaOptions, IOptions<HttpOptions> httpOptions, IOptionsMonitor<ExtensionsOptions> extensionsOptions
             )
         {
             _configuration = configration;
@@ -25,6 +26,11 @@ namespace ConfigurationSpike
                 Console.WriteLine($"Kafka Options changed: {JsonConvert.SerializeObject(options)}");
             });
             _httpOptions = httpOptions.Value;
+            _extensionsOptions = extensionsOptions;
+            extensionsOptions.OnChange((options) =>
+            {
+                Console.WriteLine($"Extensions Options changed: {JsonConvert.SerializeObject(options)}");
+            });
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
@@ -49,6 +55,7 @@ namespace ConfigurationSpike
         private void ShowKafkaOptions(ElapsedEventArgs e)
         {
             Console.WriteLine($"{e.SignalTime}: KafaOptions: {JsonConvert.SerializeObject(_kafkaOptions.CurrentValue)}");
+            Console.WriteLine($"{e.SignalTime}: ExtensionsOptions: {JsonConvert.SerializeObject(_extensionsOptions.CurrentValue)}");
         }
 
         private void UpdateTheRegistration()
