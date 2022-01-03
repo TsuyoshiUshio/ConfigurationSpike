@@ -8,8 +8,8 @@ namespace ConfigurationSpike
 {
     public class ExtensionsOptions
     {
-        public HttpOptions http { get; set; }
-        public KafkaOptions kafka { get; set; }
-        public EventHubsOptions eventHubs { get; set; }
+        public HttpOptions Http { get; set; }
+        public KafkaOptions Kafka { get; set; }
+        public EventHubsOptions EventHubs { get; set; }
     }
 }
